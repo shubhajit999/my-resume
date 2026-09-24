@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - ResumeForge</title>
+  <link rel="stylesheet" href="/static/css/main.css">
+</head>
+<body>
+  <nav class="navbar">
+    <a href="/dashboard" class="navbar-brand">🔨 ResumeForge</a>
+    <div class="navbar-nav" id="nav-right"></div>
+  </nav>
+
+  <div class="container">
+    <div class="dashboard-header">
+      <div class="dashboard-title">
+        <h1>My Resumes</h1>
+        <p>Manage, customize, export, and print your resume documents</p>
+      </div>
+      <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <input type="file" id="json-file-input" accept=".json" style="display: none;">
+        <button id="import-json-btn" class="btn btn-secondary" style="width: auto;">
+          📥 Import JSON
+        </button>
+        <button id="create-resume-btn" class="btn btn-primary" style="width: auto;">
+          + Create New Resume
+        </button>
+      </div>
+    </div>
+
+    <div id="dashboard-alert" class="alert"></div>
+
+    <div id="resume-grid" class="resume-grid">
+      <div style="grid-column: 1/-1; text-align: center; padding: 2rem;">
+        Loading your resumes...
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/js/api.js"></script>
+  <script src="/static/js/auth.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", async () => {
+      requireAuth();
+
+      const grid = document.getElementById("resume-grid");
+      const createBtn = document.getElementById("create-resume-btn");
+      const importBtn = document.getElementById("import-json-btn");
+      const jsonFileInput = document.getElementById("json-file-input");
+
+      async function loadResumes() {
+        try {
+          const resumes = await api.getResumes();
+          renderResumes(resumes);
+        } catch (err) {
+          showAlert("dashboard-alert", err.message || "Failed to load resumes.");
+        }
+      }
+
+      function renderResumes(resumes) {
+        if (!resumes || resumes.length === 0) {
+          grid.innerHTML = `
+            <div class="empty-state" style="grid-column: 1/-1;">
+              <h3>No Resumes Created Yet</h3>
+              <p>Click below to create your very first professional resume draft or import a JSON backup.</p>
+              <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 1rem;">
+                <button onclick="handleCreateResume()" class="btn btn-primary" style="width: auto;">
+                  Create Your First Resume
+                </button>
+                <button onclick="document.getElementById('json-file-input').click()" class="btn btn-secondary" style="width: auto;">
+                  Import JSON Backup
+                </button>
+              </div>
+            </div>
+          `;
+          return;
+        }
+
+        grid.innerHTML = resumes.map(r => `
+          <div class="resume-card">
+            <div>
+              <div class="resume-card-title">${escapeHTML(r.title)}</div>
+              <div class="resume-card-date">Updated: ${new Date(r.updated_at).toLocaleDateString()}</div>
+              <span style="font-size: 0.8rem; background: #e0e7ff; color: #4338ca; padding: 2px 8px; border-radius: 4px;">
+                Template: ${escapeHTML(r.template_id)}
+              </span>
+            </div>
+            <div style="margin-top: 1.25rem; display: flex; gap: 0.4rem; flex-wrap: wrap;">
+              <a href="/builder?id=${r.id}" class="btn btn-primary" style="padding: 0.35rem 0.6rem; font-size: 0.8rem; width: auto;">Edit</a>
+              <button onclick="api.openPrintView('${r.id}')" class="btn btn-secondary" style="padding: 0.35rem 0.6rem; font-size: 0.8rem; width: auto;">🖨️ PDF</button>
+              <button onclick="api.exportJSON('${r.id}', '${escapeHTML(r.title)}')" class="btn btn-secondary" style="padding: 0.35rem 0.6rem; font-size: 0.8rem; width: auto;">JSON</button>
+              <button onclick="handleDuplicateResume('${r.id}')" class="btn btn-secondary" style="padding: 0.35rem 0.6rem; font-size: 0.8rem; width: auto;">Copy</button>
+              <button onclick="handleDeleteResume('${r.id}', '${escapeHTML(r.title)}')" class="btn btn-secondary" style="padding: 0.35rem 0.6rem; font-size: 0.8rem; width: auto; color: #dc2626;">Del</button>
+            </div>
+          </div>
+        `).join("");
+      }
+
+      function escapeHTML(str) {
+        return String(str || "").replace(/[&<>"']/g, match => ({
+          '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+        }[match]));
+      }
+
+      window.handleCreateResume = async function() {
+        const title = prompt("Enter a title for your new resume:", "Software Engineer Resume");
+        if (!title || !title.trim()) return;
+
+        try {
+          const created = await api.createResume(title.trim());
+          showAlert("dashboard-alert", "Resume created successfully!", "success");
+          window.location.href = `/builder?id=${created.id}`;
+        } catch (err) {
+          showAlert("dashboard-alert", err.message || "Could not create resume.");
+        }
+      };
+
+      window.handleDuplicateResume = async function(resumeId) {
+        try {
+          await api.request(`/resumes/${resumeId}/duplicate`, { method: "POST" });
+          showAlert("dashboard-alert", "Resume duplicated successfully!", "success");
+          await loadResumes();
+        } catch (err) {
+          showAlert("dashboard-alert", err.message || "Could not duplicate resume.");
+        }
+      };
+
+      window.handleDeleteResume = async function(resumeId, title) {
+        if (!confirm(`Are you sure you want to delete "${title}"?`)) return;
+
+        try {
+          await api.request(`/resumes/${resumeId}`, { method: "DELETE" });
+          showAlert("dashboard-alert", "Resume deleted successfully!", "success");
+          await loadResumes();
+        } catch (err) {
+          showAlert("dashboard-alert", err.message || "Could not delete resume.");
+        }
+      };
+
+      importBtn.addEventListener("click", () => jsonFileInput.click());
+
+      jsonFileInput.addEventListener("change", async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        try {
+          const text = await file.text();
+          let jsonPayload;
+          try {
+            jsonPayload = JSON.parse(text);
+          } catch {
+            showAlert("dashboard-alert", "Invalid JSON file. Could not parse format.");
+            return;
+          }
+
+          const imported = await api.importJSON(jsonPayload);
+          showAlert("dashboard-alert", "Resume imported successfully!", "success");
+          setTimeout(() => {
+            window.location.href = `/builder?id=${imported.id}`;
+          }, 500);
+        } catch (err) {
+          showAlert("dashboard-alert", err.message || "Failed to import JSON file.");
+        } finally {
+          jsonFileInput.value = "";
+        }
+      });
+
+      createBtn.addEventListener("click", window.handleCreateResume);
+
+      await loadResumes();
+    });
+  </script>
+</body>
+</html>

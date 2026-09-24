@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Resume Builder - ResumeForge</title>
+  <link rel="stylesheet" href="/static/css/main.css">
+  <link rel="stylesheet" href="/static/css/builder.css">
+</head>
+<body style="height: 100vh; overflow: hidden;">
+  <!-- Navigation / Header -->
+  <nav class="navbar" style="border-bottom: 1px solid #cbd5e1; padding: 0.75rem 1.5rem;">
+    <div style="display: flex; align-items: center; gap: 1rem;">
+      <a href="/dashboard" class="btn btn-secondary" style="width: auto; padding: 0.4rem 0.8rem; font-size: 0.85rem;">
+        ← Dashboard
+      </a>
+      <input type="text" id="resume-title-input" class="form-control" style="font-weight: 700; font-size: 1.1rem; border: 1px solid transparent; background: transparent;" value="Untitled Resume">
+    </div>
+
+    <div class="builder-nav-status">
+      <span id="save-status-indicator" class="status-indicator status-saved">✓ All changes saved</span>
+      
+      <select id="template-select" class="form-control" style="width: auto; padding: 0.4rem 0.6rem; font-size: 0.85rem;">
+        <option value="modern">Template: Modern</option>
+        <option value="classic">Template: Classic</option>
+        <option value="minimalist">Template: Minimalist</option>
+      </select>
+
+      <input type="color" id="theme-color-input" style="width: 32px; height: 32px; padding: 0; border: none; cursor: pointer; border-radius: 4px;" value="#4f46e5" title="Choose Primary Theme Color">
+
+      <button onclick="api.openPrintView(resumeState.id)" class="btn btn-secondary" style="width: auto; padding: 0.4rem 0.8rem; font-size: 0.85rem;">
+        🖨️ PDF Print View
+      </button>
+
+      <button onclick="api.exportJSON(resumeState.id, resumeState.title)" class="btn btn-secondary" style="width: auto; padding: 0.4rem 0.8rem; font-size: 0.85rem;">
+        📥 Export JSON
+      </button>
+
+      <button onclick="saveResume()" class="btn btn-primary" style="width: auto; padding: 0.4rem 0.9rem; font-size: 0.85rem;">
+        Save Resume
+      </button>
+    </div>
+  </nav>
+
+  <!-- Split Screen Layout -->
+  <div class="builder-layout">
+    <!-- Left Editor Pane -->
+    <div class="editor-pane">
+      
+      <!-- Personal Information Section -->
+      <div class="builder-section">
+        <div class="builder-section-header">
+          <span class="builder-section-title">👤 Personal Information</span>
+        </div>
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label class="form-label">Full Name</label>
+            <input type="text" id="personal-full_name" class="form-control" placeholder="Jane Doe">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email Address</label>
+            <input type="email" id="personal-email" class="form-control" placeholder="jane@example.com">
+          </div>
+        </div>
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label class="form-label">Phone</label>
+            <input type="text" id="personal-phone" class="form-control" placeholder="+1 (555) 000-0000">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Location</label>
+            <input type="text" id="personal-location" class="form-control" placeholder="San Francisco, CA">
+          </div>
+        </div>
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label class="form-label">LinkedIn URL</label>
+            <input type="text" id="personal-linkedin_url" class="form-control" placeholder="linkedin.com/in/username">
+          </div>
+          <div class="form-group">
+            <label class="form-label">GitHub / Portfolio URL</label>
+            <input type="text" id="personal-github_url" class="form-control" placeholder="github.com/username">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Professional Summary</label>
+          <textarea id="personal-summary" class="form-control" rows="3" placeholder="Brief summary of your professional experience and key qualifications..."></textarea>
+        </div>
+      </div>
+
+      <!-- Work Experience Section -->
+      <div class="builder-section">
+        <div class="builder-section-header">
+          <span class="builder-section-title">💼 Work Experience</span>
+        </div>
+        <div id="work-experiences-list"></div>
+        <button onclick="addWorkExperience()" class="btn-add-item">+ Add Work Experience</button>
+      </div>
+
+      <!-- Education Section -->
+      <div class="builder-section">
+        <div class="builder-section-header">
+          <span class="builder-section-title">🎓 Education</span>
+        </div>
+        <div id="education-list"></div>
+        <button onclick="addEducation()" class="btn-add-item">+ Add Education</button>
+      </div>
+
+      <!-- Skills Section -->
+      <div class="builder-section">
+        <div class="builder-section-header">
+          <span class="builder-section-title">⚡ Skills</span>
+        </div>
+        <div id="skills-list"></div>
+        <button onclick="addSkill()" class="btn-add-item">+ Add Skill</button>
+      </div>
+
+      <!-- Projects Section -->
+      <div class="builder-section">
+        <div class="builder-section-header">
+          <span class="builder-section-title">🚀 Projects</span>
+        </div>
+        <div id="projects-list"></div>
+        <button onclick="addProject()" class="btn-add-item">+ Add Project</button>
+      </div>
+
+      <!-- Certifications Section -->
+      <div class="builder-section">
+        <div class="builder-section-header">
+          <span class="builder-section-title">📜 Certifications</span>
+        </div>
+        <div id="certifications-list"></div>
+        <button onclick="addCertification()" class="btn-add-item">+ Add Certification</button>
+      </div>
+
+      <!-- Custom Sections -->
+      <div class="builder-section">
+        <div class="builder-section-header">
+          <span class="builder-section-title">✨ Custom Sections</span>
+        </div>
+        <div id="custom-sections-list"></div>
+        <button onclick="addCustomSection()" class="btn-add-item">+ Add Custom Section</button>
+      </div>
+
+    </div>
+
+    <!-- Right Live Preview Pane -->
+    <div class="preview-pane">
+      <div id="resume-paper" class="resume-paper template-modern">
+        <!-- Live preview rendered dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/js/api.js"></script>
+  <script src="/static/js/auth.js"></script>
+  <script src="/static/js/builder.js"></script>
+</body>
+</html>

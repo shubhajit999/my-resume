@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: resumeforge_db
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-resumeforge_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-resumeforge_password}
+      POSTGRES_DB: ${POSTGRES_DB:-resumeforge_db}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-resumeforge_user} -d ${POSTGRES_DB:-resumeforge_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: .
+    container_name: resumeforge_backend
+    restart: always
+    environment:
+      - PROJECT_NAME=ResumeForge
+      - API_V1_STR=/api/v1
+      - ENVIRONMENT=production
+      - DEBUG=false
+      - SECRET_KEY=${SECRET_KEY:-production_secret_key_change_in_env}
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-resumeforge_user}:${POSTGRES_PASSWORD:-resumeforge_password}@db:5432/${POSTGRES_DB:-resumeforge_db}
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
