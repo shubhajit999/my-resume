@@ -1,20 +1,6 @@
 import pytest
 from fastapi.testclient import TestClient
 
-from app.db.base import Base
-from app.db.session import engine
-
-
-@pytest.fixture(autouse=True)
-def setup_database():
-    """
-    Ensures clean database tables for export/import test execution.
-    """
-    Base.metadata.create_all(bind=engine)
-    yield
-    Base.metadata.drop_all(bind=engine)
-    Base.metadata.create_all(bind=engine)
-
 
 def get_auth_headers(client: TestClient, email: str, name: str) -> dict:
     reg_payload = {"email": email, "full_name": name, "password": "password123"}
@@ -37,6 +23,17 @@ def test_pdf_print_view_success(client: TestClient):
     assert "A4 portrait" in response.text
     assert "margin: 12mm" in response.text
     assert "break-inside: avoid" in response.text
+
+
+def test_unauthenticated_print_view_rejected(client: TestClient):
+    headers = get_auth_headers(client, "printowner@example.com", "Print Owner")
+    create_res = client.post("/api/v1/resumes/", json={"title": "Protected Resume"}, headers=headers)
+    resume_id = create_res.json()["id"]
+
+    # Direct access without Authorization header must return 401
+    response = client.get(f"/api/v1/resumes/{resume_id}/print")
+    assert response.status_code == 401
+    assert "Not authenticated" in response.json()["detail"]
 
 
 def test_json_export_success(client: TestClient):

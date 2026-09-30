@@ -3,41 +3,129 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login - ResumeForge</title>
+  <title>Login - MyResume</title>
+  <script>
+    if (localStorage.getItem("myresume_theme") === "dark") {
+      document.documentElement.classList.add("dark-mode");
+    }
+  </script>
   <link rel="stylesheet" href="/static/css/main.css">
 </head>
 <body>
+  <!-- Ambient Background Orbs -->
+  <div class="bg-ambient">
+    <div class="bg-orb-1"></div>
+    <div class="bg-orb-2"></div>
+    <div class="bg-orb-3"></div>
+    <div class="bg-orb-4"></div>
+  </div>
+
+  <!-- Navigation -->
   <nav class="navbar">
-    <a href="/" class="navbar-brand">🔨 ResumeForge</a>
+    <a href="/" class="navbar-brand">
+      <span class="brand-logo-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M7 3H14L19 8V20C19 20.5523 18.5523 21 18 21H7C6.44772 21 6 20.5523 6 20V4C6 3.44772 6.44772 3 7 3Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M14 3V8H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="10" cy="11" r="1.25" fill="currentColor"/>
+          <path d="M13.5 11H16.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M9 15H16.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M9 17.5H14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </span>
+      MyResume
+    </a>
     <div class="navbar-nav" id="nav-right"></div>
   </nav>
 
+  <!-- Main Auth Page Content -->
   <div class="container auth-wrapper">
-    <div class="auth-card">
-      <div class="auth-header">
-        <h1>Welcome Back</h1>
-        <p>Log in to your ResumeForge account</p>
+    <div class="auth-container">
+      
+      <!-- Left Visual Pane (55% Width) -->
+      <div class="auth-visual-pane">
+        <div class="auth-brand-badge">
+          ✨ Intelligent Resume Builder
+        </div>
+        <h1 class="auth-headline">
+          Craft Job-Winning Resumes with <span class="highlight">Precision</span>
+        </h1>
+        <p class="auth-subtext">
+          Create recruiter-approved, ATS-optimized resumes in minutes with real-time live preview and professional templates.
+        </p>
+
+        <!-- 3D Decorative Resume Showcase Stage -->
+        <div class="resume-3d-stage">
+          <div class="resume-3d-card" id="tilt-resume-card">
+            <!-- Floating 3D Badge -->
+            <div class="floating-3d-badge">
+              <span class="badge-icon">⚡</span>
+              <span class="badge-text">98% ATS Score</span>
+            </div>
+
+            <!-- Miniature A4 Resume Sheet -->
+            <div class="mini-resume-sheet">
+              <div class="mini-resume-header">
+                <div class="mini-avatar">JD</div>
+                <div class="mini-user-info">
+                  <div class="mini-name-text">Jane Doe</div>
+                  <div class="mini-role-text">Senior Software Engineer</div>
+                  <div class="mini-contact-text">jane@example.com &bull; San Francisco, CA</div>
+                </div>
+              </div>
+
+              <div class="mini-resume-body">
+                <div class="mini-section-heading">Professional Summary</div>
+                <div class="mini-text-line">Senior Full-Stack Engineer with 6+ years of experience building scalable SaaS web apps...</div>
+
+                <div class="mini-section-heading">Work Experience</div>
+                <div class="mini-job-title">Lead Software Engineer — TechCorp</div>
+                <div class="mini-text-line">&bull; Architected microservices platform handling 2M+ daily active requests.</div>
+                <div class="mini-text-line">&bull; Reduced API response latencies by 40% with automated database indexing.</div>
+
+                <div class="mini-section-heading">Key Skills</div>
+                <div class="mini-chips-wrapper">
+                  <span class="mini-chip">FastAPI</span>
+                  <span class="mini-chip">Python</span>
+                  <span class="mini-chip">PostgreSQL</span>
+                  <span class="mini-chip">System Architecture</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div id="login-alert" class="alert"></div>
+      <!-- Right Form Card Pane (45% Width) -->
+      <div class="auth-card-pane">
+        <div class="auth-card">
+          <div class="auth-header">
+            <h1>Welcome Back</h1>
+            <p>Log in to your MyResume account</p>
+          </div>
 
-      <form id="login-form">
-        <div class="form-group">
-          <label class="form-label" for="email">Email Address</label>
-          <input type="email" id="email" class="form-control" placeholder="you@example.com" required>
+          <div id="login-alert" class="alert"></div>
+
+          <form id="login-form">
+            <div class="form-group">
+              <label class="form-label" for="email">Email Address</label>
+              <input type="email" id="email" class="form-control" placeholder="you@example.com" required autocomplete="email">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="password">Password</label>
+              <input type="password" id="password" class="form-control" placeholder="••••••••" required autocomplete="current-password">
+            </div>
+
+            <button type="submit" id="login-btn" class="btn btn-primary">Sign In</button>
+          </form>
+
+          <div class="auth-footer">
+            Don't have an account? <a href="/register">Sign up here</a>
+          </div>
         </div>
-
-        <div class="form-group">
-          <label class="form-label" for="password">Password</label>
-          <input type="password" id="password" class="form-control" placeholder="••••••••" required>
-        </div>
-
-        <button type="submit" id="login-btn" class="btn btn-primary">Sign In</button>
-      </form>
-
-      <div class="auth-footer">
-        Don't have an account? <a href="/register">Sign up here</a>
       </div>
+
     </div>
   </div>
 

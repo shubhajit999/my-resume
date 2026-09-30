@@ -39,6 +39,23 @@ def test_database_connection(test_db_session):
     assert result == 1
 
 
+def test_database_isolation_verification():
+    """
+    Verifies that application engine points to resumeforge_dev.db while test_engine points strictly to resumeforge_test.db.
+    Guarantees test suite NEVER modifies or drops resumeforge_dev.db.
+    """
+    from tests.conftest import test_engine
+    from app.db.session import engine as app_engine
+    
+    app_db_url = str(app_engine.url)
+    test_db_url = str(test_engine.url)
+    
+    assert "resumeforge_dev.db" in app_db_url, f"Application engine expected resumeforge_dev.db, got {app_db_url}"
+    assert "resumeforge_test.db" in test_db_url, f"Test engine expected resumeforge_test.db, got {test_db_url}"
+    assert "resumeforge_dev.db" not in test_db_url, f"Test engine MUST NOT point to resumeforge_dev.db!"
+
+
+
 def test_models_creation_and_cascade_delete(test_db_session):
     """
     Verifies creation of User, Resume, and nested sections with CASCADE deletion.

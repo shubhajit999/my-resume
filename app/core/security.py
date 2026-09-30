@@ -1,7 +1,17 @@
-import bcrypt
+try:
+    import bcrypt
+except ImportError:
+    bcrypt = None
+
 from datetime import datetime, timedelta, timezone
 from typing import Any, Optional, Union
-from jose import jwt, JWTError
+
+try:
+    from jose import jwt, JWTError
+except ImportError:
+    jwt = None
+    JWTError = Exception
+
 
 from app.core.config import settings
 

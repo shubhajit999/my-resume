@@ -2,20 +2,6 @@ import uuid
 import pytest
 from fastapi.testclient import TestClient
 
-from app.db.base import Base
-from app.db.session import engine
-
-
-@pytest.fixture(autouse=True)
-def setup_e2e_database():
-    """
-    Ensures clean database tables for end-to-end user journey test execution.
-    """
-    Base.metadata.create_all(bind=engine)
-    yield
-    Base.metadata.drop_all(bind=engine)
-    Base.metadata.create_all(bind=engine)
-
 
 def test_complete_e2e_user_journey(client: TestClient):
     """

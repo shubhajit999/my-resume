@@ -1,42 +1,134 @@
-/* ResumeForge Builder & Live Preview Stylesheet */
+/* ==========================================================================
+   MyResume Builder & Live Preview Stylesheet (Phase 5 Visual Alignment)
+   ========================================================================== */
 
+/* Main Split-Screen Workspace Layout */
 .builder-layout {
   display: flex;
   height: calc(100vh - 65px);
   overflow: hidden;
+  position: relative;
+  background-color: #f8fafc;
 }
 
-/* Header & Status Bar */
+/* Builder Navigation & Status Bar Header */
+.builder-navbar {
+  background: #ffffff;
+  border-bottom: 1.5px solid #e2e8f0;
+  padding: 0.65rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.03);
+  position: relative;
+  z-index: 50;
+}
+
+.btn-builder-back {
+  background: #f1f5f9;
+  color: #334155;
+  border: 1px solid #cbd5e1;
+  padding: 0.4rem 0.85rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  border-radius: 8px;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  transition: all 0.15s ease;
+}
+
+.btn-builder-back:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+.builder-logo-badge {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #2563eb, #4f46e5);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.3);
+}
+
+.builder-title-input {
+  font-weight: 800 !important;
+  font-size: 1.05rem !important;
+  border: 1.5px solid transparent !important;
+  background: transparent !important;
+  color: #0f172a !important;
+  padding: 0.25rem 0.5rem !important;
+  border-radius: 6px !important;
+  transition: all 0.15s ease !important;
+}
+
+.builder-title-input:hover, .builder-title-input:focus {
+  border-color: #cbd5e1 !important;
+  background: #ffffff !important;
+}
+
 .builder-nav-status {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  font-size: 0.85rem;
+  flex-wrap: wrap;
 }
 
 .status-indicator {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  padding: 0.25rem 0.6rem;
+  padding: 0.35rem 0.75rem;
   border-radius: 9999px;
-  font-weight: 500;
-  font-size: 0.8rem;
+  font-weight: 700;
+  font-size: 0.78rem;
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
 }
 
 .status-saved {
-  background-color: #dcfce7;
+  background-color: #f0fdf4;
   color: #15803d;
+  border-color: #bbf7d0;
 }
 
 .status-saving {
-  background-color: #fef9c3;
-  color: #a16207;
+  background-color: #fffbeb;
+  color: #b45309;
+  border-color: #fef3c7;
 }
 
 .status-unsaved {
-  background-color: #fee2e2;
+  background-color: #fef2f2;
   color: #b91c1c;
+  border-color: #fecaca;
+}
+
+.builder-select {
+  padding: 0.4rem 0.7rem !important;
+  font-size: 0.85rem !important;
+  font-weight: 600 !important;
+  border-radius: 8px !important;
+  border: 1.5px solid #cbd5e1 !important;
+  background: #ffffff !important;
+  cursor: pointer;
+}
+
+.color-picker-input {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1.5px solid #cbd5e1;
+  cursor: pointer;
+  border-radius: 8px;
+  background: transparent;
+  overflow: hidden;
 }
 
 /* Editor Pane (Left) */
@@ -44,9 +136,10 @@
   flex: 1;
   max-width: 50%;
   overflow-y: auto;
-  padding: 1.5rem;
+  padding: 1.5rem 1.75rem;
   background-color: #f8fafc;
-  border-right: 1px solid #e2e8f0;
+  border-right: 1.5px solid #e2e8f0;
+  scroll-behavior: smooth;
 }
 
 /* Live Preview Pane (Right) */
@@ -54,226 +147,181 @@
   flex: 1;
   max-width: 50%;
   overflow-y: auto;
-  padding: 2rem;
-  background-color: #475569;
+  padding: 2.5rem 2rem;
+  background: radial-gradient(circle at top center, #1e293b 0%, #0f172a 100%);
   display: flex;
   justify-content: center;
   align-items: flex-start;
+  position: relative;
 }
 
 /* Section Cards & Form Controls */
 .builder-section {
   background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  padding: 1.25rem;
-  margin-bottom: 1.25rem;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+  border: 1.5px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 1.5rem;
+  margin-bottom: 1.35rem;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.03);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.builder-section:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.05);
 }
 
 .builder-section-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 1px solid #f1f5f9;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.65rem;
+  border-bottom: 1.5px solid #f1f5f9;
 }
 
 .builder-section-title {
   font-size: 1.1rem;
-  font-weight: 700;
-  color: #1e293b;
+  font-weight: 800;
+  color: #0f172a;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  letter-spacing: -0.01em;
 }
 
 .item-card {
   background: #f8fafc;
-  border: 1px solid #cbd5e1;
-  border-radius: 6px;
-  padding: 1rem;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 12px;
+  padding: 1.1rem;
   margin-bottom: 1rem;
   position: relative;
+  transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.item-card:hover {
+  border-color: #4f46e5;
+  background: #ffffff;
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.08);
 }
 
 .item-card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.85rem;
 }
 
 .item-card-title {
-  font-weight: 600;
+  font-weight: 800;
   font-size: 0.95rem;
   color: #334155;
 }
 
 .btn-remove-item {
-  background: none;
-  border: none;
-  color: #ef4444;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #dc2626;
   cursor: pointer;
-  font-size: 0.85rem;
-  font-weight: 600;
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 0.25rem 0.65rem;
+  border-radius: 6px;
+  transition: all 0.2s ease;
 }
 
 .btn-remove-item:hover {
-  text-decoration: underline;
+  background: #dc2626;
+  color: #ffffff;
+  border-color: #dc2626;
 }
 
 .btn-add-item {
   width: 100%;
-  padding: 0.6rem;
-  background: #f1f5f9;
-  border: 1px dashed #94a3b8;
-  border-radius: 6px;
-  color: #475569;
-  font-weight: 600;
+  padding: 0.75rem;
+  background: rgba(241, 245, 249, 0.8);
+  border: 1.5px dashed #a5b4fc;
+  border-radius: 12px;
+  color: #4f46e5;
+  font-weight: 800;
+  font-size: 0.9rem;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
 }
 
 .btn-add-item:hover {
-  background: #e2e8f0;
-  color: #1e293b;
+  background: #e0e7ff;
+  border-color: #4f46e5;
+  color: #3730a3;
 }
 
 .form-grid-2 {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0.75rem;
+  gap: 0.85rem;
 }
 
 /* Resume Paper Simulation */
 .resume-paper {
   background: #ffffff;
-  width: 210mm; /* A4 width */
-  min-height: 297mm; /* A4 height */
+  width: 210mm;
+  min-height: 297mm;
   padding: 20mm;
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.1);
   color: #1e293b;
-  font-size: 10.5pt;
-  line-height: 1.4;
+  font-size: 10pt;
+  line-height: 1.45;
   box-sizing: border-box;
+  transform-origin: top center;
+  transition: transform 0.2s ease;
 }
 
-/* Resume Template Themes */
-
-/* Modern Template */
-.template-modern .preview-name {
-  font-size: 24pt;
-  font-weight: 800;
-  color: var(--theme-color, #4f46e5);
-  margin-bottom: 4px;
-}
-
-.template-modern .preview-contact {
-  font-size: 9pt;
-  color: #64748b;
-  margin-bottom: 16px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-}
-
-.template-modern .preview-section-heading {
-  font-size: 12pt;
-  font-weight: 700;
-  text-transform: uppercase;
-  color: var(--theme-color, #4f46e5);
-  border-bottom: 2px solid var(--theme-color, #4f46e5);
-  padding-bottom: 3px;
-  margin-top: 14px;
-  margin-bottom: 8px;
-}
-
-/* Classic Template */
-.template-classic .preview-name {
-  font-size: 26pt;
-  font-weight: 700;
-  text-align: center;
-  font-family: Georgia, serif;
-  color: #1e293b;
-}
-
-.template-classic .preview-contact {
-  text-align: center;
-  font-size: 9.5pt;
-  margin-bottom: 20px;
-  color: #475569;
-}
-
-.template-classic .preview-section-heading {
-  font-size: 13pt;
-  font-weight: 700;
-  font-family: Georgia, serif;
-  text-align: center;
-  text-transform: uppercase;
-  border-bottom: 1px solid #94a3b8;
-  padding-bottom: 4px;
-  margin-top: 16px;
-  margin-bottom: 10px;
-}
-
-/* Minimalist Template */
-.template-minimalist .preview-name {
-  font-size: 22pt;
-  font-weight: 600;
-  letter-spacing: -0.5px;
-}
-
-.template-minimalist .preview-contact {
-  font-size: 9pt;
-  color: #475569;
-  margin-bottom: 16px;
-}
-
-.template-minimalist .preview-section-heading {
-  font-size: 11pt;
-  font-weight: 600;
-  color: #0f172a;
-  border-bottom: 1px solid #cbd5e1;
-  padding-bottom: 2px;
-  margin-top: 12px;
-  margin-bottom: 6px;
-}
-
-/* Resume Content Items */
-.preview-item {
-  margin-bottom: 10px;
-  break-inside: avoid;
-}
-
-.preview-item-header {
-  display: flex;
-  justify-content: space-between;
-  font-weight: 700;
-  font-size: 10.5pt;
-}
-
-.preview-item-sub {
-  display: flex;
-  justify-content: space-between;
-  font-style: italic;
-  font-size: 9.5pt;
-  color: #475569;
-  margin-bottom: 3px;
-}
-
-.preview-item-desc {
-  font-size: 9.5pt;
-  white-space: pre-line;
-}
-
-/* Mobile Responsive Adjustments */
+/* Mobile View Switcher Tab Bar */
 .view-toggle-bar {
   display: none;
   background: #ffffff;
-  padding: 0.5rem;
-  border-bottom: 1px solid #e2e8f0;
+  padding: 0.6rem 1rem;
+  border-bottom: 1.5px solid #e2e8f0;
+  gap: 0.5rem;
+  justify-content: center;
+  position: sticky;
+  top: 60px;
+  z-index: 40;
 }
 
+.tab-btn {
+  flex: 1;
+  max-width: 200px;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+  color: #475569;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.tab-btn.active {
+  background: #4f46e5;
+  color: #ffffff;
+  border-color: #4f46e5;
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.3);
+}
+
+/* Responsive Media Queries */
 @media (max-width: 992px) {
+  .view-toggle-bar {
+    display: flex;
+  }
   .builder-layout {
     flex-direction: column;
     height: auto;
@@ -284,12 +332,259 @@
     flex: none;
     width: 100%;
   }
+  .editor-pane.mobile-hidden {
+    display: none !important;
+  }
   .preview-pane {
-    padding: 1rem;
+    padding: 1.5rem 1rem;
     overflow-x: auto;
   }
+  .preview-pane:not(.mobile-visible) {
+    display: none !important;
+  }
+  .preview-pane.mobile-visible {
+    display: flex !important;
+  }
   .resume-paper {
-    transform: scale(0.85);
+    transform: scale(0.82);
     transform-origin: top center;
   }
 }
+
+/* Profile Photo Upload Control */
+.photo-upload-container {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 1rem;
+  background-color: #f8fafc;
+  border: 1.5px dashed #cbd5e1;
+  border-radius: 12px;
+  margin-bottom: 1.25rem;
+}
+
+.photo-preview-wrapper {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid #2563eb;
+  background-color: #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2);
+}
+
+.photo-preview-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.photo-placeholder {
+  font-size: 2rem;
+  color: #94a3b8;
+  line-height: 1;
+  user-select: none;
+}
+
+.photo-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.photo-hint {
+  font-size: 0.78rem;
+  color: #64748b;
+  width: 100%;
+  margin-top: 0.2rem;
+}
+
+.photo-error-msg {
+  background-color: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.btn-danger-outline {
+  background: transparent;
+  color: #dc2626;
+  border: 1.5px solid #fca5a5;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.85rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 700;
+  transition: all 0.2s ease;
+}
+
+.btn-danger-outline:hover {
+  background-color: #fef2f2;
+  border-color: #dc2626;
+}
+
+/* ==========================================================================
+   BUILDER DARK MODE STYLES
+   ========================================================================== */
+body.dark-mode .builder-layout,
+.dark-mode .builder-layout {
+  background-color: #0f172a;
+  color: #f8fafc;
+}
+
+body.dark-mode .builder-navbar {
+  background: #1e293b;
+  border-bottom-color: #334155;
+}
+
+body.dark-mode .btn-builder-back {
+  background: #0f172a;
+  border-color: #334155;
+  color: #cbd5e1;
+}
+
+body.dark-mode .btn-builder-back:hover {
+  background: #334155;
+  color: #ffffff;
+}
+
+body.dark-mode .builder-title-input {
+  color: #f8fafc !important;
+}
+
+body.dark-mode .builder-title-input:hover,
+body.dark-mode .builder-title-input:focus {
+  border-color: #334155 !important;
+  background: #0f172a !important;
+}
+
+body.dark-mode .builder-select {
+  background: #0f172a !important;
+  border-color: #334155 !important;
+  color: #f8fafc !important;
+}
+
+body.dark-mode .color-picker-input {
+  border-color: #334155;
+}
+
+body.dark-mode .editor-pane {
+  background-color: #0f172a;
+  border-right-color: #334155;
+}
+
+body.dark-mode .builder-section {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+body.dark-mode .builder-section:hover {
+  border-color: #475569;
+}
+
+body.dark-mode .builder-section-header {
+  border-bottom-color: #334155;
+}
+
+body.dark-mode .builder-section-title {
+  color: #f8fafc;
+}
+
+body.dark-mode .item-card {
+  background: #0f172a;
+  border-color: #334155;
+}
+
+body.dark-mode .item-card:hover {
+  border-color: #6366f1;
+  background: #1e293b;
+}
+
+body.dark-mode .item-card-title {
+  color: #e2e8f0;
+}
+
+body.dark-mode .btn-add-item {
+  background: #0f172a;
+  border-color: #4338ca;
+  color: #818cf8;
+}
+
+body.dark-mode .btn-add-item:hover {
+  background: #312e81;
+  color: #a5b4fc;
+}
+
+body.dark-mode .template-ribbon-card {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+body.dark-mode .template-ribbon-card:hover {
+  border-color: #6366f1;
+}
+
+body.dark-mode .template-ribbon-card.active {
+  border-color: #6366f1;
+  background: #1e293b;
+}
+
+body.dark-mode .template-ribbon-name {
+  color: #e2e8f0;
+}
+
+body.dark-mode .photo-upload-container {
+  background-color: #0f172a;
+  border-color: #334155;
+}
+
+body.dark-mode .photo-hint {
+  color: #94a3b8;
+}
+
+body.dark-mode .modal-content {
+  background: #1e293b;
+  border: 1px solid #334155;
+}
+
+body.dark-mode .modal-header {
+  border-bottom-color: #334155;
+}
+
+body.dark-mode .modal-title {
+  color: #f8fafc;
+}
+
+body.dark-mode .modal-close {
+  color: #94a3b8;
+}
+
+body.dark-mode .template-card {
+  background: #0f172a;
+  border-color: #334155;
+}
+
+body.dark-mode .template-card-name {
+  color: #f8fafc;
+}
+
+body.dark-mode .template-card-desc {
+  color: #94a3b8;
+}
+
+/* CRITICAL: Resume Paper Simulation stays white with dark text! */
+body.dark-mode .resume-paper,
+.dark-mode .resume-paper {
+  background: #ffffff !important;
+  color: #1e293b !important;
+}
+

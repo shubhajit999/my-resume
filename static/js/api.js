@@ -133,7 +133,7 @@ class APIClient {
     });
   }
 
-  async exportJSON(resumeId, title = "Resume") {
+  async exportJSON(resumeId, title = "") {
     const token = this.getToken();
     const response = await fetch(`${this.baseURL}/resumes/${resumeId}/export/json`, {
       headers: { Authorization: `Bearer ${token}` }
@@ -142,12 +142,14 @@ class APIClient {
       throw new Error("Failed to export JSON backup.");
     }
     const data = await response.json();
+    const exportTitle = (title || data.title || "Resume").trim();
+    const cleanFileName = exportTitle.replace(/[\/\\?%*:|"<>]/g, '_').replace(/\s+/g, '_');
     const jsonStr = JSON.stringify(data, null, 2);
     const blob = new Blob([jsonStr], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `${title.replace(/\s+/g, '_')}_backup.json`;
+    a.download = `${cleanFileName}_backup.json`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -161,8 +163,67 @@ class APIClient {
     });
   }
 
-  openPrintView(resumeId) {
-    window.open(`${this.baseURL}/resumes/${resumeId}/print`, "_blank");
+  async openPrintView(resumeId) {
+    const token = this.getToken();
+    if (!token) {
+      alert("You must be logged in to view or print this resume.");
+      window.location.href = "/login";
+      return;
+    }
+
+    // Open new tab synchronously before async fetch to prevent popup blocking
+    const printWindow = window.open("", "_blank");
+    if (!printWindow) {
+      alert("Pop-up blocked. Please allow pop-ups to open the PDF print view.");
+      return;
+    }
+
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Loading Print View...</title>
+        <style>
+          body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background: #f8fafc; color: #475569; }
+        </style>
+      </head>
+      <body>
+        <div>⌛ Preparing printable PDF document...</div>
+      </body>
+      </html>
+    `);
+
+    try {
+      const response = await fetch(`${this.baseURL}/resumes/${resumeId}/print`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          if (printWindow && !printWindow.closed) printWindow.close();
+          this.clearSession();
+          window.location.href = "/login";
+          return;
+        }
+        const errData = await response.json().catch(() => ({}));
+        if (printWindow && !printWindow.closed) printWindow.close();
+        throw new Error(errData.detail || "Could not generate PDF print view.");
+      }
+
+      const htmlContent = await response.text();
+
+      printWindow.document.open();
+      printWindow.document.write(htmlContent);
+      printWindow.document.close();
+      printWindow.focus();
+    } catch (err) {
+      if (printWindow && !printWindow.closed) {
+        printWindow.close();
+      }
+      alert(err.message || "Failed to load PDF print view.");
+    }
   }
 }
 

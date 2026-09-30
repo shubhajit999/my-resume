@@ -2,19 +2,6 @@ import pytest
 from fastapi.testclient import TestClient
 
 from app.main import app
-from app.db.base import Base
-from app.db.session import engine
-
-
-@pytest.fixture(autouse=True)
-def setup_test_database():
-    """
-    Ensures clean database tables for auth test execution.
-    """
-    Base.metadata.create_all(bind=engine)
-    yield
-    Base.metadata.drop_all(bind=engine)
-    Base.metadata.create_all(bind=engine)
 
 
 def test_register_user_success(client: TestClient):
@@ -190,3 +177,23 @@ def test_change_password_incorrect_current(client: TestClient):
     change_res = client.put("/api/v1/auth/password", json=change_payload, headers=headers)
     assert change_res.status_code == 400
     assert "Incorrect current password" in change_res.json()["detail"]
+
+
+def test_login_unknown_email(client: TestClient):
+    login_payload = {
+        "email": "nonexistent_user@example.com",
+        "password": "somepassword123",
+    }
+    response = client.post("/api/v1/auth/login", json=login_payload)
+    assert response.status_code == 400
+    assert "Incorrect email or password" in response.json()["detail"]
+
+
+def test_protected_endpoint_with_expired_token(client: TestClient):
+    from datetime import timedelta
+    from app.core.security import create_access_token
+    expired_token = create_access_token(subject="00000000-0000-0000-0000-000000000000", expires_delta=timedelta(minutes=-1))
+    headers = {"Authorization": f"Bearer {expired_token}"}
+    response = client.get("/api/v1/auth/me", headers=headers)
+    assert response.status_code == 401
+

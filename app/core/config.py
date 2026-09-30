@@ -10,6 +10,13 @@ class Settings(BaseSettings):
     SECRET_KEY: str = "default_development_secret_key_change_in_production"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 1440
 
+    ALLOWED_ORIGINS: list[str] = [
+        "http://127.0.0.1:8000",
+        "http://localhost:8000",
+        "http://127.0.0.1:3000",
+        "http://localhost:3000",
+    ]
+
     POSTGRES_SERVER: str = "localhost"
     POSTGRES_PORT: int = 5432
     POSTGRES_USER: str = "resumeforge_user"

@@ -3,73 +3,895 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard - ResumeForge</title>
+  <title>Dashboard - MyResume</title>
+  <script>
+    if (localStorage.getItem("myresume_theme") === "dark") {
+      document.documentElement.classList.add("dark-mode");
+    }
+  </script>
   <link rel="stylesheet" href="/static/css/main.css">
+  <link rel="stylesheet" href="/static/css/templates.css">
+  <link rel="stylesheet" href="/static/css/dashboard.css">
+  <style>
+    /* Create Resume Modal Styles */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: rgba(15, 23, 42, 0.55);
+      backdrop-filter: blur(4px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      padding: 1rem;
+    }
+
+    .modal-card {
+      background-color: #ffffff;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 18px;
+      box-shadow: 0 20px 40px -10px rgba(15, 23, 42, 0.2);
+      width: 100%;
+      max-width: 480px;
+      padding: 1.85rem;
+      animation: modalFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes modalFadeIn {
+      from { opacity: 0; transform: scale(0.94) translateY(8px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.25rem;
+    }
+
+    .modal-header h2 {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: #0f172a;
+      letter-spacing: -0.01em;
+    }
+
+    .modal-close-btn {
+      background: #f1f5f9;
+      border: none;
+      font-size: 1.3rem;
+      line-height: 1;
+      color: #64748b;
+      cursor: pointer;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+    }
+
+    .modal-close-btn:hover {
+      background: #e2e8f0;
+      color: #0f172a;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.75rem;
+      margin-top: 1.5rem;
+    }
+
+    .modal-actions .btn {
+      width: auto;
+      min-width: 100px;
+    }
+
+    @media (max-width: 640px) {
+      .modal-card {
+        padding: 1.25rem;
+        max-width: 100%;
+      }
+      .modal-actions {
+        flex-direction: column-reverse;
+      }
+      .modal-actions .btn {
+        width: 100%;
+      }
+    }
+  </style>
 </head>
 <body>
-  <nav class="navbar">
-    <a href="/dashboard" class="navbar-brand">🔨 ResumeForge</a>
-    <div class="navbar-nav" id="nav-right"></div>
-  </nav>
-
-  <div class="container">
-    <div class="dashboard-header">
-      <div class="dashboard-title">
-        <h1>My Resumes</h1>
-        <p>Manage, customize, export, and print your resume documents</p>
+  <!-- Mobile Navbar -->
+  <div class="mobile-navbar">
+    <a href="/dashboard" class="sidebar-brand" style="border:none; padding:0; text-decoration:none;">
+      <div class="sidebar-logo-icon" style="width:34px; height:34px;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M7 3H14L19 8V20C19 20.5523 18.5523 21 18 21H7C6.44772 21 6 20.5523 6 20V4C6 3.44772 6.44772 3 7 3Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
       </div>
-      <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-        <input type="file" id="json-file-input" accept=".json" style="display: none;">
-        <button id="import-json-btn" class="btn btn-secondary" style="width: auto;">
-          📥 Import JSON
+      <span class="sidebar-brand-text" style="font-size:1.1rem;">MyResume</span>
+    </a>
+    <button class="mobile-nav-toggle" id="mobile-sidebar-toggle" aria-label="Toggle navigation menu">☰ Menu</button>
+  </div>
+
+  <div class="app-layout">
+    <!-- Left Sidebar Navigation -->
+    <aside class="app-sidebar" id="app-sidebar">
+      <div class="sidebar-top-group">
+        <div class="sidebar-brand">
+          <div class="sidebar-logo-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M7 3H14L19 8V20C19 20.5523 18.5523 21 18 21H7C6.44772 21 6 20.5523 6 20V4C6 3.44772 6.44772 3 7 3Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M14 3V8H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="10" cy="11" r="1.25" fill="currentColor"/>
+              <path d="M13.5 11H16.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              <path d="M9 15H16.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              <path d="M9 17.5H14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="brand-text-wrap">
+            <span class="sidebar-brand-text">MyResume</span>
+            <span class="sidebar-brand-subtext">Build Your Dream Career</span>
+          </div>
+        </div>
+
+        <nav class="sidebar-menu">
+          <a href="/dashboard" class="sidebar-nav-item active">
+            <span class="sidebar-nav-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+            </span>
+            <span>Home</span>
+          </a>
+          <a href="#my-resumes-section" class="sidebar-nav-item">
+            <span class="sidebar-nav-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            </span>
+            <span>My Resumes</span>
+          </a>
+          <a href="#templates-showcase-section" class="sidebar-nav-item">
+            <span class="sidebar-nav-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            </span>
+            <span>Templates</span>
+          </a>
+          <!-- Accessible Theme Toggle Control (Replacing AI Assistant Placeholder) -->
+          <button type="button" id="theme-toggle-btn" class="sidebar-nav-item" onclick="toggleTheme()" aria-label="Toggle Light or Dark Mode">
+            <span class="sidebar-nav-icon">🌙</span>
+            <span>Dark Mode</span>
+          </button>
+          <button type="button" class="sidebar-nav-item" onclick="document.getElementById('json-file-input').click()">
+            <span class="sidebar-nav-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            </span>
+            <span>Import JSON</span>
+          </button>
+        </nav>
+      </div>
+
+      <!-- Sidebar Bottom Promotional Card -->
+      <div class="sidebar-promo-card">
+        <div class="promo-target-icon">🎯</div>
+        <div class="promo-title">Your Future Starts Here</div>
+        <div class="promo-sub">Create a professional resume in minutes and get closer to your dream job.</div>
+        <button type="button" onclick="handleCreateResume()" class="promo-btn">
+          Build Now →
         </button>
-        <button id="create-resume-btn" class="btn btn-primary" style="width: auto;">
-          + Create New Resume
+      </div>
+
+      <!-- User Account Section Footer -->
+      <div class="sidebar-footer">
+        <div class="user-profile-info">
+          <div class="user-avatar-badge" id="user-avatar-initials">U</div>
+          <div class="user-details-text">
+            <span class="user-name" id="sidebar-user-name">User Account</span>
+            <span class="user-role" id="sidebar-user-email">Free Plan</span>
+          </div>
+        </div>
+        <button onclick="api.logout()" class="btn-logout-icon" title="Logout" aria-label="Logout">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M9 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.2071 4.46957 3 5 3H9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M16 17L21 12L16 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M21 12H9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
         </button>
       </div>
-    </div>
+    </aside>
 
-    <div id="dashboard-alert" class="alert"></div>
+    <!-- Center Main Content Area -->
+    <main class="app-main">
+      <!-- Hidden compatibility container for nav-right -->
+      <div id="nav-right" style="display: none;"></div>
 
-    <div id="resume-grid" class="resume-grid">
-      <div style="grid-column: 1/-1; text-align: center; padding: 2rem;">
-        Loading your resumes...
+      <!-- Top Header Row -->
+      <div class="main-header-row">
+        <div class="header-welcome-meta">
+          <h1 id="welcome-heading">Hello, User 👋</h1>
+          <p>Create, customize and download your perfect resume.</p>
+        </div>
+        <div class="header-right-actions">
+          <div class="header-user-avatar-pill">
+            <div class="header-user-avatar" id="header-avatar-initials">U</div>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+          </div>
+        </div>
       </div>
+
+      <!-- Dashboard Hero Welcome Card -->
+      <div class="dashboard-hero">
+        <div class="hero-content">
+          <div class="hero-pill-badge">
+            ✨ Welcome to MyResume
+          </div>
+          <h2 class="hero-headline">
+            <span class="hero-highlight-pill">Your</span> Success<br>
+            Starts with a <span class="hero-gold-text">Great Resume</span>
+          </h2>
+          <div class="hero-indicators-row">
+            <span class="hero-indicator">✓ Professional Templates</span>
+            <span class="hero-indicator">✓ Easy to Customize</span>
+            <span class="hero-indicator">✓ Download in PDF</span>
+          </div>
+          <div class="hero-actions">
+            <input type="file" id="json-file-input" accept=".json" style="display: none;">
+            <button id="create-resume-btn" class="btn-hero-primary" onclick="handleCreateResume()">
+              Create New Resume →
+            </button>
+            <button id="import-json-btn" class="btn-hero-secondary">
+              📥 Import JSON
+            </button>
+          </div>
+        </div>
+        <!-- Right Illustration Art in Hero Banner -->
+        <div class="hero-illustration-wrapper">
+          <div class="hero-floating-tag">Dream Apply Get Hired! 🚀</div>
+          <svg width="220" height="160" viewBox="0 0 220 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="20" y="20" width="140" height="120" rx="12" fill="white" fill-opacity="0.95" shadow="0 10px 25px rgba(0,0,0,0.15)"/>
+            <rect x="35" y="35" width="50" height="8" rx="4" fill="#2563EB"/>
+            <rect x="35" y="48" width="80" height="5" rx="2.5" fill="#94A3B8"/>
+            <rect x="35" y="62" width="110" height="4" rx="2" fill="#CBD5E1"/>
+            <rect x="35" y="70" width="95" height="4" rx="2" fill="#CBD5E1"/>
+            <rect x="35" y="78" width="105" height="4" rx="2" fill="#CBD5E1"/>
+            <rect x="35" y="92" width="45" height="6" rx="3" fill="#7C3AED"/>
+            <rect x="35" y="104" width="110" height="4" rx="2" fill="#CBD5E1"/>
+            <circle cx="145" cy="50" r="16" fill="#E0E7FF"/>
+            <path d="M145 44V56M139 50H151" stroke="#4F46E5" stroke-width="2.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+      </div>
+
+      <div id="dashboard-alert" class="alert" style="display: none;"></div>
+
+      <!-- My Resumes Section Header & Grid -->
+      <div id="my-resumes-section" class="section-header-bar">
+        <div class="section-title-wrap">
+          <div class="section-icon-box">📁</div>
+          <h2>My Resumes</h2>
+          <span id="resume-count-badge" class="count-badge">0 Resumes</span>
+        </div>
+        <div class="controls-bar">
+          <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="resume-search-input" class="search-input" placeholder="Search by title or template...">
+          </div>
+          <select id="resume-sort-select" class="sort-select">
+            <option value="updated_desc">Recently Updated</option>
+            <option value="updated_asc">Oldest Updated</option>
+            <option value="title_asc">Title (A-Z)</option>
+            <option value="title_desc">Title (Z-A)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Resumes Cards Grid -->
+      <div id="resume-grid" class="resume-grid">
+        <div style="grid-column: 1/-1; text-align: center; padding: 3rem; color: #64748b;">
+          Loading your resumes...
+        </div>
+      </div>
+
+      <!-- Choose Your Template Showcase Section -->
+      <div id="templates-showcase-section" class="template-showcase-wrapper">
+        <div class="section-header-bar">
+          <div class="section-title-wrap">
+            <div class="section-icon-box" style="background:#f3e8ff; color:#7c3aed;">🎨</div>
+            <div>
+              <h2 style="font-size: 1.4rem;">Choose Your Template</h2>
+              <p style="font-size: 0.88rem; color:#64748b; margin:0;">Pick a template that fits your style and profession.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filter Pill Tabs -->
+        <div class="template-filter-tabs">
+          <button type="button" class="filter-tab active" onclick="filterTemplates('all', this)">All</button>
+          <button type="button" class="filter-tab" onclick="filterTemplates('modern', this)">Modern</button>
+          <button type="button" class="filter-tab" onclick="filterTemplates('creative', this)">Creative</button>
+          <button type="button" class="filter-tab" onclick="filterTemplates('professional', this)">Professional</button>
+          <button type="button" class="filter-tab" onclick="filterTemplates('simple', this)">Simple / Minimal</button>
+        </div>
+
+        <!-- Template Showcase Grid -->
+        <div class="template-showcase-grid" id="template-showcase-grid">
+          <!-- Rendered dynamically -->
+        </div>
+
+        <div style="text-align: center; margin-top: 1.75rem;">
+          <button type="button" class="btn-use-template-gradient" onclick="handleCreateResume()">
+            Use This Template →
+          </button>
+        </div>
+      </div>
+
+      <!-- Help & Support and Contact Footer Section -->
+      <div class="dashboard-support-footer">
+        <div class="support-card">
+          <div class="support-card-left">
+            <div class="support-icon-wrap">💬</div>
+            <div class="support-text-wrap">
+              <h3>Help & Support</h3>
+              <p>Having a problem? Let us know and we'll help you.</p>
+              <div class="support-contact-email">
+                Contact: <a href="mailto:swadeshkarak752@gmail.com" class="contact-email-link">swadeshkarak752@gmail.com</a>
+              </div>
+            </div>
+          </div>
+          <div class="support-card-right">
+            <a href="mailto:swadeshkarak752@gmail.com?subject=MyResume%20-%20Problem%20Report" class="btn-report-problem">
+              Report a Problem
+            </a>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Right Live Preview Panel -->
+    <aside class="right-preview-panel">
+      <div class="preview-panel-header">
+        <div class="preview-panel-title">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/></svg>
+          Live Preview
+        </div>
+        <div class="preview-mode-switch">
+          <button type="button" class="mode-pill active">Desktop</button>
+          <button type="button" class="mode-pill">Mobile</button>
+        </div>
+      </div>
+
+      <!-- Section 1: Live Resume Card Container (Demo) -->
+      <div class="live-preview-card" id="live-preview-card">
+        <div class="live-card-header">
+          <div class="live-card-avatar" id="live-preview-avatar">SK</div>
+          <div class="live-card-identity">
+            <div class="live-card-name" id="live-preview-name">Swadesh Karak</div>
+            <div class="live-card-title" id="live-preview-role">Software Engineer Resume</div>
+          </div>
+        </div>
+
+        <div class="live-card-contacts" id="live-preview-contact">
+          <span>📞 +91 98765 43210</span>
+          <span>✉️ swadeshkarak@gmail.com</span>
+          <span>📍 Kolkata, West Bengal</span>
+          <span>🔗 linkedin.com/in/swadeshkarak</span>
+        </div>
+
+        <div class="live-card-section">
+          <div class="live-section-title">Professional Summary</div>
+          <div class="live-section-body" id="live-preview-summary">
+            Motivated and detail-oriented Full Stack Developer with experience in building modern web applications using React, FastAPI and cloud technologies. Passionate about solving real-world problems and creating scalable solutions.
+          </div>
+        </div>
+
+        <div class="live-card-section">
+          <div class="live-section-title">Skills</div>
+          <div class="live-skills-chips" id="live-preview-skills">
+            <span class="skill-chip">Python</span>
+            <span class="skill-chip">JavaScript</span>
+            <span class="skill-chip">React</span>
+            <span class="skill-chip">FastAPI</span>
+            <span class="skill-chip">Docker</span>
+            <span class="skill-chip">AWS</span>
+            <span class="skill-chip">Git</span>
+            <span class="skill-chip">SQL</span>
+          </div>
+        </div>
+
+        <div class="live-card-section">
+          <div class="live-section-title">Experience</div>
+          <div class="live-section-body" id="live-preview-exp">
+            <strong>Software Development Intern</strong><br>
+            <span style="color:#64748b; font-size:0.75rem;">ABC Tech Solutions • 2024 – Present</span>
+            <ul style="margin-top:3px; padding-left:14px; margin-bottom:0;">
+              <li>Built responsive web applications using React and FastAPI.</li>
+              <li>Collaborated with a team of 5 developers using Git.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="live-card-section">
+          <div class="live-section-title">Education</div>
+          <div class="live-section-body" id="live-preview-edu">
+            <strong>B.Tech in Computer Science & Engineering</strong><br>
+            <span style="color:#64748b; font-size:0.75rem;">XYZ College, West Bengal • 2020 – 2024</span>
+          </div>
+        </div>
+
+        <div class="live-card-actions">
+          <button type="button" class="btn-live-download" id="live-preview-download-btn">
+            📥 Download PDF
+          </button>
+          <button type="button" class="btn-live-share" id="live-preview-share-btn">
+            🔗 Share Resume
+          </button>
+        </div>
+
+        <!-- Resume Snapshot Area -->
+        <div class="live-card-snapshot">
+          <div class="snapshot-header">
+            <span class="snapshot-title">📊 Resume Snapshot</span>
+            <span class="snapshot-badge">Demo</span>
+          </div>
+          <div class="snapshot-metrics">
+            <div class="metric-item">
+              <span class="metric-value">100%</span>
+              <span class="metric-label">Complete</span>
+            </div>
+            <div class="metric-item">
+              <span class="metric-value">ATS</span>
+              <span class="metric-label">Ready</span>
+            </div>
+            <div class="metric-item">
+              <span class="metric-value">A4</span>
+              <span class="metric-label">PDF Format</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Professional SaaS Resume & Workspace Illustration -->
+        <div class="live-preview-illustration-wrap">
+          <svg width="270" height="150" viewBox="0 0 270 150" fill="none" xmlns="http://www.w3.org/2000/svg" class="live-preview-svg">
+            <defs>
+              <linearGradient id="saas_illust_bg" x1="0" y1="0" x2="270" y2="150" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#EEF2FF"/>
+                <stop offset="0.6" stop-color="#E0E7FF"/>
+                <stop offset="1" stop-color="#F3E8FF"/>
+              </linearGradient>
+              <linearGradient id="doc_header_grad" x1="0" y1="0" x2="110" y2="0" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#2563EB"/>
+                <stop offset="1" stop-color="#7C3AED"/>
+              </linearGradient>
+              <linearGradient id="laptop_screen_bg" x1="0" y1="0" x2="0" y2="55" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#0F172A"/>
+                <stop offset="1" stop-color="#1E293B"/>
+              </linearGradient>
+            </defs>
+
+            <!-- Card Background Container -->
+            <rect width="270" height="150" rx="14" fill="url(#saas_illust_bg)" fill-opacity="0.85"/>
+
+            <!-- Ambient Glow Shapes -->
+            <circle cx="35" cy="25" r="22" fill="#3B82F6" fill-opacity="0.12"/>
+            <circle cx="235" cy="30" r="25" fill="#8B5CF6" fill-opacity="0.15"/>
+            <circle cx="240" cy="125" r="18" fill="#EC4899" fill-opacity="0.1"/>
+
+            <!-- Desk Line Base -->
+            <rect x="15" y="132" width="240" height="2" rx="1" fill="#CBD5E1"/>
+
+            <!-- Small Potted Plant (Left Side) -->
+            <g transform="translate(18, 92)">
+              <path d="M4 22L7 40H23L26 22H4Z" fill="#D97706"/>
+              <rect x="2" y="18" width="26" height="4" rx="2" fill="#B45309"/>
+              <path d="M15 18Q8 8 3 12Q10 20 15 18Z" fill="#10B981"/>
+              <path d="M15 18Q22 8 27 12Q20 20 15 18Z" fill="#059669"/>
+              <path d="M15 18Q15 4 11 2Q12 12 15 18Z" fill="#34D399"/>
+            </g>
+
+            <!-- Stacked Books & Stationery (Right Side) -->
+            <g transform="translate(205, 96)">
+              <rect x="0" y="24" width="48" height="10" rx="2" fill="#4F46E5"/>
+              <rect x="42" y="26" width="4" height="6" fill="#E0E7FF"/>
+              <rect x="5" y="15" width="40" height="9" rx="2" fill="#7C3AED"/>
+              <rect x="40" y="17" width="3" height="5" fill="#F3E8FF"/>
+              <rect x="30" y="0" width="12" height="15" rx="2" fill="#38BDF8"/>
+              <line x1="34" y1="-5" x2="34" y2="4" stroke="#2563EB" stroke-width="2" stroke-linecap="round"/>
+              <line x1="38" y1="-8" x2="38" y2="4" stroke="#EC4899" stroke-width="2" stroke-linecap="round"/>
+            </g>
+
+            <!-- Laptop (Workspace Behind Resume) -->
+            <g transform="translate(118, 48)">
+              <rect x="0" y="0" width="95" height="64" rx="5" fill="url(#laptop_screen_bg)" stroke="#334155" stroke-width="1.8"/>
+              <rect x="5" y="5" width="85" height="54" rx="3" fill="#1E293B"/>
+              <rect x="10" y="12" width="35" height="4" rx="2" fill="#38BDF8"/>
+              <rect x="10" y="21" width="65" height="3" rx="1.5" fill="#64748B"/>
+              <rect x="10" y="28" width="50" height="3" rx="1.5" fill="#475569"/>
+              <rect x="10" y="35" width="60" height="3" rx="1.5" fill="#475569"/>
+              <rect x="10" y="44" width="28" height="7" rx="3.5" fill="#8B5CF6"/>
+              <path d="M-12 64H107L100 72H-5L-12 64Z" fill="#CBD5E1"/>
+              <rect x="32" y="66" width="30" height="3" rx="1" fill="#94A3B8"/>
+            </g>
+
+            <!-- Resume / CV Document (Foreground Center/Left) -->
+            <g transform="translate(42, 16)">
+              <rect x="0" y="0" width="112" height="116" rx="8" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.5"/>
+              <rect x="10" y="10" width="92" height="20" rx="4" fill="url(#doc_header_grad)"/>
+              <circle cx="22" cy="20" r="6" fill="#FFFFFF"/>
+              <rect x="33" y="16" width="40" height="3.5" rx="1.5" fill="#FFFFFF"/>
+              <rect x="33" y="22" width="25" height="2.5" rx="1" fill="#E0E7FF"/>
+
+              <rect x="10" y="36" width="30" height="3" rx="1.5" fill="#2563EB"/>
+              <rect x="10" y="42" width="92" height="2.5" rx="1" fill="#94A3B8"/>
+              <rect x="10" y="47" width="78" height="2.5" rx="1" fill="#CBD5E1"/>
+
+              <rect x="10" y="56" width="35" height="3" rx="1.5" fill="#7C3AED"/>
+              <rect x="10" y="62" width="55" height="2.5" rx="1" fill="#334155"/>
+              <rect x="10" y="67" width="88" height="2.5" rx="1" fill="#CBD5E1"/>
+              <rect x="10" y="72" width="68" height="2.5" rx="1" fill="#CBD5E1"/>
+
+              <rect x="10" y="81" width="25" height="3" rx="1.5" fill="#2563EB"/>
+              <rect x="10" y="87" width="18" height="6" rx="3" fill="#E0E7FF"/>
+              <rect x="31" y="87" width="22" height="6" rx="3" fill="#F3E8FF"/>
+              <rect x="56" y="87" width="20" height="6" rx="3" fill="#E0F2FE"/>
+
+              <rect x="10" y="101" width="92" height="2" rx="1" fill="#E2E8F0"/>
+            </g>
+
+            <!-- Floating Checklist Badge 1 (Top Left) -->
+            <g transform="translate(14, 8)">
+              <rect x="0" y="0" width="76" height="20" rx="10" fill="#FFFFFF" stroke="#10B981" stroke-width="1.2"/>
+              <circle cx="10" cy="10" r="5.5" fill="#10B981"/>
+              <path d="M7.5 10L9.5 12L13 8" stroke="white" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+              <text x="20" y="13.2" fill="#0F172A" font-size="8.5" font-weight="700" font-family="sans-serif">ATS Passed</text>
+            </g>
+
+            <!-- Floating Checklist Badge 2 (Bottom Center) -->
+            <g transform="translate(135, 114)">
+              <rect x="0" y="0" width="88" height="22" rx="11" fill="#FFFFFF" stroke="#4F46E5" stroke-width="1.2"/>
+              <circle cx="11" cy="11" r="6" fill="#4F46E5"/>
+              <path d="M8.5 11L10.5 13L14.5 9" stroke="white" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+              <text x="22" y="14.5" fill="#0F172A" font-size="8.5" font-weight="700" font-family="sans-serif">Job Ready 100%</text>
+            </g>
+
+            <!-- Floating Sparkle Accents -->
+            <path d="M125 14L126.5 19.5L132 21L126.5 22.5L125 28L123.5 22.5L118 21L123.5 19.5Z" fill="#F59E0B"/>
+            <path d="M250 82L251.2 85.5L255 86.8L251.2 88L250 91.5L248.8 88L245 86.8L248.8 85.5Z" fill="#3B82F6"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Section 2: Resume Tips Card -->
+      <div class="right-panel-card resume-tips-card">
+        <div class="card-header-title">
+          <span class="card-icon">💡</span>
+          <h3>Resume Tips</h3>
+        </div>
+        <p class="card-subtitle">Make your resume stronger with these simple tips.</p>
+        <ul class="tips-list">
+          <li><span class="tip-check">✓</span> Keep your summary short and focused</li>
+          <li><span class="tip-check">✓</span> Highlight your strongest skills</li>
+          <li><span class="tip-check">✓</span> Add measurable achievements</li>
+          <li><span class="tip-check">✓</span> Keep your resume easy to scan</li>
+          <li><span class="tip-check">✓</span> Keep formatting consistent</li>
+        </ul>
+      </div>
+
+      <!-- Section 3: Resume Checklist Card -->
+      <div class="right-panel-card resume-checklist-card">
+        <div class="card-header-title">
+          <span class="card-icon-check">✓</span>
+          <h3>Resume Checklist</h3>
+        </div>
+        <div class="checklist-items">
+          <div class="checklist-item"><span class="checklist-check">✓</span> Personal Information</div>
+          <div class="checklist-item"><span class="checklist-check">✓</span> Professional Summary</div>
+          <div class="checklist-item"><span class="checklist-check">✓</span> Skills</div>
+          <div class="checklist-item"><span class="checklist-check">✓</span> Work Experience</div>
+          <div class="checklist-item"><span class="checklist-check">✓</span> Education</div>
+          <div class="checklist-item"><span class="checklist-check">✓</span> Projects</div>
+        </div>
+      </div>
+
+      <!-- Section 4: Quick Resume Guide Card -->
+      <div class="right-panel-card quick-guide-card">
+        <div class="card-header-title">
+          <span class="card-icon">🚀</span>
+          <h3>Quick Resume Guide</h3>
+        </div>
+        <p class="guide-text">
+          Build a clear and professional resume by keeping your content focused, readable and achievement-oriented.
+        </p>
+      </div>
+    </aside>
+  </div>
+
+  <!-- Create Resume Modal -->
+  <div id="create-resume-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2>Create New Resume</h2>
+        <button type="button" class="modal-close-btn" id="modal-close-x-btn" aria-label="Close">&times;</button>
+      </div>
+      <form id="create-resume-form" novalidate>
+        <div id="modal-alert" class="alert alert-error" style="display: none;"></div>
+        <div class="form-group">
+          <label for="modal-resume-title" class="form-label">Resume Title</label>
+          <input type="text" id="modal-resume-title" class="form-control" placeholder="e.g. Software Engineer Resume" value="Software Engineer Resume">
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" id="modal-cancel-btn">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="modal-submit-btn">Create</button>
+        </div>
+      </form>
     </div>
   </div>
 
   <script src="/static/js/api.js"></script>
   <script src="/static/js/auth.js"></script>
   <script>
+    const TEMPLATE_NAMES = {
+      modern: "Modern",
+      professional: "Professional",
+      minimal: "Minimal",
+      ats: "ATS-Friendly",
+      creative: "Creative",
+      corporate: "Corporate",
+      executive: "Executive",
+      student: "Student / Fresher",
+      two_column: "Two-Column",
+      elegant: "Elegant",
+    };
+
+    const SHOWCASE_TEMPLATES = [
+      { id: "modern", name: "Modern", tag: "Clean & Professional", cat: "modern", badge: "Popular", accent: "#2563eb" },
+      { id: "professional", name: "Professional", tag: "Traditional Corporate", cat: "professional", badge: null, accent: "#1e3a8a" },
+      { id: "minimal", name: "Minimal", tag: "Minimalist & Sleek", cat: "simple", badge: null, accent: "#475569" },
+      { id: "ats", name: "ATS-Friendly", tag: "ATS Optimized", cat: "professional", badge: null, accent: "#059669" },
+      { id: "creative", name: "Creative", tag: "Creative & Stylish", cat: "creative", badge: "Popular", accent: "#7c3aed" },
+      { id: "corporate", name: "Corporate", tag: "Business Standard", cat: "professional", badge: null, accent: "#1e293b" },
+      { id: "executive", name: "Executive", tag: "Executive & Leadership", cat: "professional", badge: null, accent: "#0f172a" },
+      { id: "student", name: "Student / Fresher", tag: "Clean & Fresh", cat: "simple", badge: null, accent: "#0d9488" },
+      { id: "two_column", name: "Two-Column", tag: "Sidebar Grid Layout", cat: "modern", badge: null, accent: "#4f46e5" },
+      { id: "elegant", name: "Elegant", tag: "Sophisticated Elegance", cat: "creative", badge: null, accent: "#881337" },
+    ];
+
+    function getMiniTemplatePreviewHTML(tId) {
+      const rawId = (tId || "modern").toLowerCase().replace("-", "_");
+      switch (rawId) {
+        case 'modern':
+          return `<div class="mini-thumb thumb-modern">
+            <div class="thumb-header"><div class="thumb-name-bar"></div><div class="thumb-sub-bar"></div></div>
+            <div class="thumb-sec-heading"></div>
+            <div class="thumb-line"></div>
+            <div class="thumb-line short"></div>
+            <div class="thumb-sec-heading"></div>
+            <div class="thumb-line"></div>
+            <div class="thumb-line short"></div>
+          </div>`;
+        case 'professional':
+          return `<div class="mini-thumb thumb-professional">
+            <div class="thumb-header-pro"><div class="thumb-name-center"></div><div class="thumb-sub-center"></div></div>
+            <div class="thumb-sec-heading-pro"></div>
+            <div class="thumb-line"></div>
+            <div class="thumb-line short"></div>
+            <div class="thumb-sec-heading-pro"></div>
+            <div class="thumb-line"></div>
+          </div>`;
+        case 'minimal':
+          return `<div class="mini-thumb thumb-minimal">
+            <div class="thumb-header-min"><div class="thumb-name-min"></div><div class="thumb-sub-min"></div></div>
+            <div class="thumb-sec-heading-min"></div>
+            <div class="thumb-line thin"></div>
+            <div class="thumb-line thin short"></div>
+            <div class="thumb-sec-heading-min"></div>
+            <div class="thumb-line thin"></div>
+          </div>`;
+        case 'ats':
+          return `<div class="mini-thumb thumb-ats">
+            <div class="thumb-header-ats"><div class="thumb-name-ats"></div><div class="thumb-sub-ats"></div></div>
+            <div class="thumb-sec-heading-ats"></div>
+            <div class="thumb-line dark"></div>
+            <div class="thumb-line dark short"></div>
+            <div class="thumb-sec-heading-ats"></div>
+            <div class="thumb-line dark"></div>
+          </div>`;
+        case 'creative':
+          return `<div class="mini-thumb thumb-creative">
+            <div class="thumb-header-banner"><div class="thumb-banner-title"></div></div>
+            <div class="thumb-sec-heading-cr"></div>
+            <div class="thumb-line"></div>
+            <div class="thumb-tags-group"><span class="thumb-tag"></span><span class="thumb-tag"></span><span class="thumb-tag"></span></div>
+            <div class="thumb-sec-heading-cr"></div>
+            <div class="thumb-line short"></div>
+          </div>`;
+        case 'corporate':
+          return `<div class="mini-thumb thumb-corporate">
+            <div class="thumb-header-corp"><div class="thumb-name-corp"></div></div>
+            <div class="thumb-sec-heading-corp"></div>
+            <div class="thumb-line"></div>
+            <div class="thumb-line short"></div>
+            <div class="thumb-sec-heading-corp"></div>
+            <div class="thumb-line"></div>
+          </div>`;
+        case 'executive':
+          return `<div class="mini-thumb thumb-executive">
+            <div class="thumb-header-exec"><div class="thumb-name-exec"></div></div>
+            <div class="thumb-sec-heading-exec"></div>
+            <div class="thumb-line"></div>
+            <div class="thumb-line short"></div>
+            <div class="thumb-sec-heading-exec"></div>
+            <div class="thumb-line"></div>
+          </div>`;
+        case 'student':
+          return `<div class="mini-thumb thumb-student">
+            <div class="thumb-header-st"><div class="thumb-name-st"></div></div>
+            <div class="thumb-sec-pill-st"></div>
+            <div class="thumb-line"></div>
+            <div class="thumb-sec-pill-st"></div>
+            <div class="thumb-line short"></div>
+            <div class="thumb-line"></div>
+          </div>`;
+        case 'two_column':
+          return `<div class="mini-thumb thumb-two-column">
+            <div class="thumb-sidebar">
+              <div class="thumb-name-side"></div>
+              <div class="thumb-dot-line"></div>
+              <div class="thumb-dot-line"></div>
+              <div class="thumb-dot-line"></div>
+            </div>
+            <div class="thumb-mainbar">
+              <div class="thumb-sec-heading-tc"></div>
+              <div class="thumb-line"></div>
+              <div class="thumb-line short"></div>
+              <div class="thumb-sec-heading-tc"></div>
+              <div class="thumb-line"></div>
+            </div>
+          </div>`;
+        case 'elegant':
+          return `<div class="mini-thumb thumb-elegant">
+            <div class="thumb-header-el"><div class="thumb-name-el"></div></div>
+            <div class="thumb-dash-line"></div>
+            <div class="thumb-sec-heading-el"></div>
+            <div class="thumb-line"></div>
+            <div class="thumb-sec-heading-el"></div>
+            <div class="thumb-line short"></div>
+          </div>`;
+        default:
+          return `<div class="mini-thumb"><div class="thumb-header"></div><div class="thumb-line"></div></div>`;
+      }
+    }
+
+    let allResumes = [];
+    let activeResume = null;
+
     document.addEventListener("DOMContentLoaded", async () => {
       requireAuth();
+
+      // Set user details in sidebar & header
+      const user = api.getUser();
+      if (user && user.full_name) {
+        const welcomeHeading = document.getElementById("welcome-heading");
+        if (welcomeHeading) {
+          const firstName = user.full_name.split(' ')[0];
+          welcomeHeading.textContent = `Hello, ${firstName} 👋`;
+        }
+        const sidebarName = document.getElementById("sidebar-user-name");
+        if (sidebarName) sidebarName.textContent = user.full_name;
+
+        const sidebarEmail = document.getElementById("sidebar-user-email");
+        if (sidebarEmail) sidebarEmail.textContent = user.email || "Free Plan";
+
+        const avatarBadge = document.getElementById("user-avatar-initials");
+        const headerAvatar = document.getElementById("header-avatar-initials");
+        const initials = user.full_name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+
+        if (avatarBadge) avatarBadge.textContent = initials || "U";
+        if (headerAvatar) headerAvatar.textContent = initials || "U";
+      }
+
+      // Mobile sidebar toggle
+      const mobileToggle = document.getElementById("mobile-sidebar-toggle");
+      const sidebar = document.getElementById("app-sidebar");
+      if (mobileToggle && sidebar) {
+        mobileToggle.addEventListener("click", () => {
+          sidebar.classList.toggle("mobile-open");
+        });
+      }
+
+      renderTemplateShowcase('all');
 
       const grid = document.getElementById("resume-grid");
       const createBtn = document.getElementById("create-resume-btn");
       const importBtn = document.getElementById("import-json-btn");
       const jsonFileInput = document.getElementById("json-file-input");
+      const countBadge = document.getElementById("resume-count-badge");
+      const searchInput = document.getElementById("resume-search-input");
+      const sortSelect = document.getElementById("resume-sort-select");
+
+      const modal = document.getElementById("create-resume-modal");
+      const modalForm = document.getElementById("create-resume-form");
+      const modalTitleInput = document.getElementById("modal-resume-title");
+      const modalAlert = document.getElementById("modal-alert");
+      const modalCancelBtn = document.getElementById("modal-cancel-btn");
+      const modalCloseXBtn = document.getElementById("modal-close-x-btn");
 
       async function loadResumes() {
         try {
           const resumes = await api.getResumes();
-          renderResumes(resumes);
+          allResumes = Array.isArray(resumes) ? resumes : [];
+          updateDisplay();
+          if (allResumes.length > 0) {
+            updateLivePreviewPanel(allResumes[0]);
+          }
         } catch (err) {
           showAlert("dashboard-alert", err.message || "Failed to load resumes.");
         }
       }
 
-      function renderResumes(resumes) {
-        if (!resumes || resumes.length === 0) {
+      function filterAndSortResumes() {
+        let result = [...allResumes];
+
+        const searchText = searchInput ? searchInput.value.trim().toLowerCase() : "";
+        if (searchText) {
+          result = result.filter(r => {
+            const titleLower = (r.title || "").toLowerCase();
+            const rawId = (r.template_id || "modern").toLowerCase().replace("-", "_");
+            const templateNameLower = (TEMPLATE_NAMES[rawId] || r.template_id || "").toLowerCase();
+            return titleLower.includes(searchText) || templateNameLower.includes(searchText);
+          });
+        }
+
+        const sortVal = sortSelect ? sortSelect.value : "updated_desc";
+        result.sort((a, b) => {
+          if (sortVal === "title_asc") return (a.title || "").localeCompare(b.title || "");
+          if (sortVal === "title_desc") return (b.title || "").localeCompare(a.title || "");
+          if (sortVal === "updated_asc") return new Date(a.updated_at || 0) - new Date(b.updated_at || 0);
+          return new Date(b.updated_at || 0) - new Date(a.updated_at || 0);
+        });
+
+        return result;
+      }
+
+      function updateDisplay() {
+        const filtered = filterAndSortResumes();
+        if (countBadge) {
+          countBadge.textContent = `${allResumes.length} ${allResumes.length === 1 ? 'Resume' : 'Resumes'}`;
+        }
+        renderResumes(filtered, allResumes.length === 0);
+      }
+
+      function formatDate(dateStr) {
+        if (!dateStr) return "Recently";
+        try {
+          const d = new Date(dateStr);
+          if (isNaN(d.getTime())) return dateStr;
+          return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+        } catch {
+          return dateStr;
+        }
+      }
+
+      function renderResumes(resumes, isTotalEmpty) {
+        if (isTotalEmpty) {
           grid.innerHTML = `
-            <div class="empty-state" style="grid-column: 1/-1;">
-              <h3>No Resumes Created Yet</h3>
-              <p>Click below to create your very first professional resume draft or import a JSON backup.</p>
-              <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 1rem;">
+            <div class="create-resume-dashed-card" onclick="handleCreateResume()">
+              <div class="dashed-card-icon">+</div>
+              <div class="dashed-card-title">Create New Resume</div>
+              <div class="dashed-card-sub">Start fresh with a new professional template</div>
+            </div>
+            <div class="empty-state-card" style="grid-column: span 2;">
+              <div class="empty-state-icon">📄</div>
+              <div class="empty-state-title">No Resumes Created Yet</div>
+              <div class="empty-state-desc">Click below to create your very first professional resume draft or import a JSON backup file.</div>
+              <div class="empty-state-actions">
                 <button onclick="handleCreateResume()" class="btn btn-primary" style="width: auto;">
-                  Create Your First Resume
+                  + Create Your First Resume
                 </button>
                 <button onclick="document.getElementById('json-file-input').click()" class="btn btn-secondary" style="width: auto;">
-                  Import JSON Backup
+                  📥 Import JSON Backup
                 </button>
               </div>
             </div>
@@ -77,25 +899,66 @@
           return;
         }
 
-        grid.innerHTML = resumes.map(r => `
-          <div class="resume-card">
-            <div>
-              <div class="resume-card-title">${escapeHTML(r.title)}</div>
-              <div class="resume-card-date">Updated: ${new Date(r.updated_at).toLocaleDateString()}</div>
-              <span style="font-size: 0.8rem; background: #e0e7ff; color: #4338ca; padding: 2px 8px; border-radius: 4px;">
-                Template: ${escapeHTML(r.template_id)}
-              </span>
+        if (!resumes || resumes.length === 0) {
+          grid.innerHTML = `
+            <div class="empty-state-card">
+              <div class="empty-state-title">No resumes found</div>
+              <div class="empty-state-desc">Try a different title or template name.</div>
+              <button onclick="document.getElementById('resume-search-input').value=''; updateDisplay();" class="btn btn-secondary" style="width: auto; margin-top: 0.5rem;">
+                Clear Search
+              </button>
             </div>
-            <div style="margin-top: 1.25rem; display: flex; gap: 0.4rem; flex-wrap: wrap;">
-              <a href="/builder?id=${r.id}" class="btn btn-primary" style="padding: 0.35rem 0.6rem; font-size: 0.8rem; width: auto;">Edit</a>
-              <button onclick="api.openPrintView('${r.id}')" class="btn btn-secondary" style="padding: 0.35rem 0.6rem; font-size: 0.8rem; width: auto;">🖨️ PDF</button>
-              <button onclick="api.exportJSON('${r.id}', '${escapeHTML(r.title)}')" class="btn btn-secondary" style="padding: 0.35rem 0.6rem; font-size: 0.8rem; width: auto;">JSON</button>
-              <button onclick="handleDuplicateResume('${r.id}')" class="btn btn-secondary" style="padding: 0.35rem 0.6rem; font-size: 0.8rem; width: auto;">Copy</button>
-              <button onclick="handleDeleteResume('${r.id}', '${escapeHTML(r.title)}')" class="btn btn-secondary" style="padding: 0.35rem 0.6rem; font-size: 0.8rem; width: auto; color: #dc2626;">Del</button>
+          `;
+          return;
+        }
+
+        const cardsHTML = resumes.map(r => {
+          const rawId = (r.template_id || "modern").toLowerCase().replace("-", "_");
+          const tName = TEMPLATE_NAMES[rawId] || escapeHTML(r.template_id);
+          const dateFormatted = formatDate(r.updated_at);
+
+          return `
+            <div class="resume-card" onclick="selectResumeForPreview('${r.id}')">
+              <div>
+                <div class="card-preview-frame" onclick="window.location.href='/builder?id=${r.id}'" title="Edit ${escapeHTML(r.title)}">
+                  ${getMiniTemplatePreviewHTML(r.template_id)}
+                  <div class="card-preview-overlay">
+                    <span class="overlay-btn">✏️ Edit Resume</span>
+                  </div>
+                </div>
+                <div class="card-meta-wrap">
+                  <div class="resume-card-title">${escapeHTML(r.title)}</div>
+                  <div class="resume-card-sub">
+                    <span>📅 ${dateFormatted}</span>
+                    <span class="template-pill">🎨 ${tName}</span>
+                  </div>
+                </div>
+              </div>
+              <div class="card-actions-toolbar">
+                <a href="/builder?id=${r.id}" class="btn-card-action btn-edit">✏️ Edit</a>
+                <button onclick="event.stopPropagation(); api.openPrintView('${r.id}')" class="btn-card-action btn-download" title="PDF Print View">🖨️ PDF</button>
+                <button onclick="event.stopPropagation(); api.exportJSON('${r.id}')" class="card-icon-btn" title="Export JSON">JSON</button>
+                <button onclick="event.stopPropagation(); handleDuplicateResume('${r.id}')" class="card-icon-btn" title="Duplicate Resume">Copy</button>
+                <button onclick="event.stopPropagation(); handleDeleteResume('${r.id}')" class="card-icon-btn btn-delete" title="Delete Resume">Del</button>
+              </div>
             </div>
+          `;
+        }).join("");
+
+        grid.innerHTML = `
+          <div class="create-resume-dashed-card" onclick="handleCreateResume()">
+            <div class="dashed-card-icon">+</div>
+            <div class="dashed-card-title">Create New Resume</div>
+            <div class="dashed-card-sub">Start fresh with a new template</div>
           </div>
-        `).join("");
+          ${cardsHTML}
+        `;
       }
+
+      window.updateDisplay = updateDisplay;
+
+      if (searchInput) searchInput.addEventListener("input", updateDisplay);
+      if (sortSelect) sortSelect.addEventListener("change", updateDisplay);
 
       function escapeHTML(str) {
         return String(str || "").replace(/[&<>"']/g, match => ({
@@ -103,18 +966,87 @@
         }[match]));
       }
 
-      window.handleCreateResume = async function() {
-        const title = prompt("Enter a title for your new resume:", "Software Engineer Resume");
-        if (!title || !title.trim()) return;
+      window.selectResumeForPreview = function(resumeId) {
+        const found = allResumes.find(r => r.id === resumeId);
+        if (found) {
+          updateLivePreviewPanel(found);
+        }
+      };
+
+      function updateLivePreviewPanel(resume) {
+        if (resume) activeResume = resume;
+
+        const downloadBtn = document.getElementById("live-preview-download-btn");
+        const shareBtn = document.getElementById("live-preview-share-btn");
+
+        if (downloadBtn) {
+          downloadBtn.onclick = (e) => { e.preventDefault(); };
+        }
+        if (shareBtn) {
+          shareBtn.onclick = (e) => { e.preventDefault(); };
+        }
+      }
+
+      function openCreateModal() {
+        modalTitleInput.value = "Software Engineer Resume";
+        modalAlert.style.display = "none";
+        modalAlert.textContent = "";
+        modal.style.display = "flex";
+        setTimeout(() => {
+          modalTitleInput.focus();
+          modalTitleInput.select();
+        }, 50);
+      }
+
+      function closeCreateModal() {
+        modal.style.display = "none";
+        modalAlert.style.display = "none";
+        modalAlert.textContent = "";
+      }
+
+      window.handleCreateResume = function() {
+        openCreateModal();
+      };
+
+      modalCancelBtn.addEventListener("click", closeCreateModal);
+      if (modalCloseXBtn) modalCloseXBtn.addEventListener("click", closeCreateModal);
+
+      modal.addEventListener("click", (e) => {
+        if (e.target === modal) closeCreateModal();
+      });
+
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && modal.style.display === "flex") closeCreateModal();
+      });
+
+      modalForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const title = modalTitleInput.value ? modalTitleInput.value.trim() : "";
+        if (!title) {
+          modalAlert.textContent = "Please enter a title for your resume.";
+          modalAlert.className = "alert alert-error";
+          modalAlert.style.display = "block";
+          return;
+        }
+
+        const submitBtn = document.getElementById("modal-submit-btn");
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Creating...";
 
         try {
-          const created = await api.createResume(title.trim());
+          const created = await api.createResume(title);
+          closeCreateModal();
           showAlert("dashboard-alert", "Resume created successfully!", "success");
           window.location.href = `/builder?id=${created.id}`;
         } catch (err) {
-          showAlert("dashboard-alert", err.message || "Could not create resume.");
+          modalAlert.textContent = err.message || "Could not create resume.";
+          modalAlert.className = "alert alert-error";
+          modalAlert.style.display = "block";
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.textContent = "Create";
         }
-      };
+      });
 
       window.handleDuplicateResume = async function(resumeId) {
         try {
@@ -126,7 +1058,9 @@
         }
       };
 
-      window.handleDeleteResume = async function(resumeId, title) {
+      window.handleDeleteResume = async function(resumeId) {
+        const target = (allResumes || []).find(r => r.id === resumeId);
+        const title = target ? target.title : "this resume";
         if (!confirm(`Are you sure you want to delete "${title}"?`)) return;
 
         try {
@@ -170,6 +1104,38 @@
 
       await loadResumes();
     });
+
+    function renderTemplateShowcase(filterCat = 'all') {
+      const gridContainer = document.getElementById("template-showcase-grid");
+      if (!gridContainer) return;
+
+      const filtered = filterCat === 'all'
+        ? SHOWCASE_TEMPLATES
+        : SHOWCASE_TEMPLATES.filter(t => t.cat === filterCat);
+
+      gridContainer.innerHTML = filtered.map(t => `
+        <div class="template-showcase-card" onclick="createResumeWithTemplate('${t.id}')">
+          <div class="showcase-thumb-wrap">
+            ${getMiniTemplatePreviewHTML(t.id)}
+            ${t.badge ? `<span class="showcase-badge">${t.badge}</span>` : ''}
+          </div>
+          <div class="showcase-meta">
+            <div class="showcase-title">${t.name}</div>
+            <div class="showcase-tag">${t.tag}</div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    window.filterTemplates = function(cat, btn) {
+      document.querySelectorAll('.filter-tab').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      renderTemplateShowcase(cat);
+    };
+
+    window.createResumeWithTemplate = function(templateId) {
+      window.handleCreateResume();
+    };
   </script>
 </body>
 </html>
