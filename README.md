@@ -1,6 +1,6 @@
-# ResumeForge
+# MyResume
 
-**ResumeForge** is a production-style, full-stack Resume Builder web application built with a clean client-server architecture using Python FastAPI, SQLAlchemy 2.0, PostgreSQL, JWT Authentication, and modern web standards.
+**MyResume** is a production-style, full-stack Resume Builder web application built with a clean client-server architecture using Python FastAPI, SQLAlchemy 2.0, PostgreSQL, JWT Authentication, and modern web standards.
 
 ---
 
